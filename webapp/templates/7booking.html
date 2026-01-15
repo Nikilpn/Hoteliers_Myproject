@@ -282,14 +282,14 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-floating date" id="date3" data-target-input="nearest">
-                                            <input type="text" name="bcheckin" class="form-control datetimepicker-input" id="checkin" placeholder="Check In" required data-target="#date3" data-toggle="datetimepicker" />
+                                        <div class="form-floating">
+                                            <input type="date" name="bcheckin" class="form-control" id="checkin" placeholder="Check In" required />
                                             <label for="checkin">Check In</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-floating date" id="date4" data-target-input="nearest">
-                                            <input type="text" class="form-control datetimepicker-input" id="checkout" name="bcheckout" placeholder="Check Out" required data-target="#date4" data-toggle="datetimepicker" />
+                                        <div class="form-floating">
+                                            <input type="date" class="form-control" id="checkout" name="bcheckout" placeholder="Check Out" required />
                                             <label for="checkout">Check Out</label>
                                         </div>
                                     </div>
@@ -316,9 +316,11 @@
                                  <div class="row g-3">
                                     <div class="col-md-12">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control"  value="{{cat.ROOMNAME}}" name="bselectroom" readonly>
+                                            <input type="text" class="form-control" value="{{cat.ROOMNAME}}" readonly>
                                             <label for="name">Room Name</label>
                                         </div><br>
+                                        <!-- Hidden field to send room ID for ForeignKey -->
+                                        <input type="hidden" name="bselectroom" value="{{cat.id}}">
                                           <div class="col-md-12">
                                                 <label for="name">Amount Payable RS.</label>
                                             <input type="text" class="form-control" value="{{cat.ROOMPRICE}}" name="btotalprice"><br>

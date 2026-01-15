@@ -82,9 +82,22 @@ def save_room_page(request):
 def save_roompages_input(request):
     if request.method == "POST":
         na = request.POST.get('customername')
-        mb = request.POST.get('customermobile')
+        mb = request.POST.get('customermobile')  # Now CharField, no conversion needed
         tl = request.POST.get('totalprice')
-        obj = Totaldb(CUSTOMERNAME=na, MOBILE=mb, TOTALPRICE=tl)
+        
+        # Optionally link to the last booking made by this customer
+        last_booking = None
+        if 'USERNAME' in request.session:
+            last_booking = bookingdb.objects.filter(
+                CUSTOMERNAME=request.session['USERNAME']
+            ).order_by('-id').first()
+        
+        obj = Totaldb(
+            BOOKING=last_booking,
+            CUSTOMERNAME=na, 
+            MOBILE=mb,  # Now CharField
+            TOTALPRICE=int(tl) if tl else None
+        )
         obj.save()
         return redirect(payment_page)
 
@@ -104,7 +117,7 @@ def save_booking_page(request, CONTACTEMAIL=None):
         cho = request.POST.get('bcheckout')
         ta = request.POST.get('btotaladults')
         tc = request.POST.get('btotalchilds')
-        sr = request.POST.get('bselectroom')
+        sr_id = request.POST.get('bselectroom')  # This is now the room ID
         sre = request.POST.get('bspecialrequest')
         tp = request.POST.get('btotalprice')
 
@@ -135,9 +148,16 @@ def save_booking_page(request, CONTACTEMAIL=None):
         # send_mail(subject, message, EMAIL_HOST_USER, [obj.CONTACTEMAIL], fail_silently=True, )
         #
         # return redirect(save_room_page)
-        # Check for overlapping bookings
+        # Get the room object from the ID
+        try:
+            room_obj = roomnamedb.objects.get(id=sr_id)
+        except roomnamedb.DoesNotExist:
+            messages.error(request, "Invalid room selection.")
+            return redirect('save_room_page')
+        
+        # Check for overlapping bookings with the ForeignKey and DateField
         overlapping_bookings = bookingdb.objects.filter(
-            SELECTROOM=sr
+            SELECTROOM=room_obj
         ).filter(
             CHECKIN__lte=cho,
             CHECKOUT__gte=chn
@@ -147,19 +167,26 @@ def save_booking_page(request, CONTACTEMAIL=None):
             messages.error(request, "The selected room is already booked for the specified dates.")
             return redirect('save_room_page')  # Redirect back to the booking form page
         else:
+            # Get the customer if logged in
+            customer_obj = None
+            if 'USERNAME' in request.session:
+                try:
+                    customer_obj = Registerdb.objects.get(USERNAME=request.session['USERNAME'])
+                except Registerdb.DoesNotExist:
+                    pass
 
-
-        # If no overlap, save the booking
+            # If no overlap, save the booking
             obj = bookingdb(
+                CUSTOMER=customer_obj,
                 CUSTOMERNAME=na,
                 CONTACTEMAIL=em,
                 CHECKIN=chn,
                 CHECKOUT=cho,
-                TOTALADULTS=ta,
-                TOTALCHILDS=tc,
-                SELECTROOM=sr,
+                TOTALADULTS=int(ta) if ta else None,
+                TOTALCHILDS=int(tc) if tc else None,
+                SELECTROOM=room_obj,  # Now a ForeignKey
                 SPECIALREQUEST=sre,
-                TOTALPRICE=tp
+                TOTALPRICE=int(tp) if tp else None
             )
             obj.save()
 
