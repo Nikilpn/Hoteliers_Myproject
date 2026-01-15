@@ -361,13 +361,15 @@ def passwordReset_verify_otp(request,user_id):
         s_otp = str(request.session.get('otp')).strip() # get stored otp
         if u_otp == s_otp:  # verifying two otp
             context = {
-                'user': user
+                'user': user,
+                'username': user.USERNAME
             }
             return render(request, "17reset_password.html", context)
         else:
             context = {
                 'error': "OTP does not match.!!",
                 'user': user,
+                'username': user.USERNAME
             }
             return render(request, "16password_reset_otp.html", context)
     else:
@@ -376,12 +378,17 @@ def passwordReset_verify_otp(request,user_id):
 from django.contrib.auth.hashers import make_password
 def reset_password(request, username):
     if request.method == "POST":
+        try:
+            user = Registerdb.objects.get(USERNAME=username)
+        except Registerdb.DoesNotExist:
+            messages.error(request, "User not found.")
+            return redirect("user_login_page")
+        
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
 
         if password1 == password2:
             try:
-                user = Registerdb.objects.get(USERNAME=username)
                 Registerdb.objects.filter(USERNAME=username).update(PASSWORD=password1)
                 messages.success(request, "Your password has been reset successfully! "
                                           "You can now log in with your new password.")
@@ -393,9 +400,14 @@ def reset_password(request, username):
                 return redirect("user_login_page")
             except Registerdb.DoesNotExist:
                 messages.error(request, "User not found.")
-                return redirect("reset_password", USERNAME=username)
+                return redirect("user_login_page")
         else:
             return render(request, "17reset_password.html",
-                          {'error': "Sorry, passwords do not match!", 'user': username})
+                          {'error': "Sorry, passwords do not match!", 'user': user, 'username': username})
     else:
-        return redirect("home")
+        try:
+            user = Registerdb.objects.get(USERNAME=username)
+            return render(request, "17reset_password.html", {'user': user, 'username': username})
+        except Registerdb.DoesNotExist:
+            messages.error(request, "User not found.")
+            return redirect("user_login_page")
