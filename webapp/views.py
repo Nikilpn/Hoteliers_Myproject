@@ -26,6 +26,12 @@ def rooms_page(request):
     return render(request, "4rooms.html")
 
 
+def advanced_search_page(request):
+    """Render the advanced room search page"""
+    room_types = roomtypedb.objects.all()
+    return render(request, "14advanced_room_search.html", {'room_types': room_types})
+
+
 def customer_contact_page(request):
     return render(request, "5contact.html")
 

@@ -8,6 +8,7 @@ urlpatterns=[
 
     path('services_page/', views.services_page, name="services_page"),
     path('rooms_page/', views.rooms_page, name="rooms_page"),
+    path('advanced_search/', views.advanced_search_page, name="advanced_search"),
 
     #contact hotel by customer
     path('customer_contact_page/', views.customer_contact_page, name="customer_contact_page"),

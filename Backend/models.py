@@ -29,3 +29,6 @@ class staffdb(models.Model):
     
     def __str__(self):
         return self.STAFFNAME or "No Name"
+
+# Import chatbot models
+from .chatbot_models import ChatbotResponse, ChatbotConversation, Notification

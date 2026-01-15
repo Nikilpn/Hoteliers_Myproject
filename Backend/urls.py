@@ -1,5 +1,5 @@
 from django.urls import path,include
-from Backend import views
+from Backend import views, chatbot_views
 urlpatterns=[
     path('index_page/',views.index_page,name="index_page"),
     path('roomtype_page/', views.roomtype_page, name="roomtype_page"),
@@ -45,5 +45,11 @@ urlpatterns=[
     path('customertotalamount_page/', views.customertotalamount_page, name="customertotalamount_page"),
     path('deletecustomertotalamount_page/<int:del_id>/', views.deletecustomertotalamount_page, name="deletecustomertotalamount_page"),
 
+# Chatbot and Search APIs
+    path('api/chatbot/query/', chatbot_views.chatbot_query, name="chatbot_query"),
+    path('api/chatbot/rate/', chatbot_views.rate_response, name="rate_response"),
+    path('api/search/rooms/', chatbot_views.search_rooms, name="search_rooms"),
+    path('api/notifications/', chatbot_views.get_notifications, name="get_notifications"),
+    path('api/notifications/mark-read/', chatbot_views.mark_notification_read, name="mark_notification_read"),
 
 ]
