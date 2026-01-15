@@ -58,17 +58,24 @@ def room_number_page(request):
 
 def save_room_number_page(request):
     if request.method == "POST":
-        rt_id = request.POST.get('roomtype')  # This is now a room type ID
+        rt_id = request.POST.get('roomtype')  # This might be ID or name
         ds = request.POST.get('roomdescription')
         rp = request.POST.get('roomprice')
         rnn = request.POST.get('roomname')
         img = request.FILES['roomimage']
         
+        # Try to get room type - handle both ID and name for backward compatibility
+        room_type = None
         try:
-            room_type = roomtypedb.objects.get(id=rt_id)  # Get the roomtypedb object
-        except roomtypedb.DoesNotExist:
-            messages.error(request, "Invalid room type selected")
-            return redirect(room_number_page)
+            # Try as ID first
+            room_type = roomtypedb.objects.get(id=int(rt_id))
+        except (ValueError, roomtypedb.DoesNotExist):
+            try:
+                # Fallback: try as name
+                room_type = roomtypedb.objects.get(ROOMTYPE__iexact=rt_id)
+            except roomtypedb.DoesNotExist:
+                messages.error(request, "Invalid room type selected")
+                return redirect(room_number_page)
         
         obj = roomnamedb(ROOMTYPE=room_type, ROOMDESCRIPTION=ds, ROOMIMAGE=img, ROOMPRICE=rp, ROOMNAME=rnn)
         obj.save()
@@ -86,7 +93,7 @@ def edit_room_number_page(request,Edit_id):
 
 def update_room_number_page(request,prop_id):
     if request.method == "POST":
-        rt_id = request.POST.get('roomtype')  # This is now a room type ID
+        rt_id = request.POST.get('roomtype')  # This might be ID or name
         ds = request.POST.get('roomdescription')
         rp = request.POST.get('roomprice')
         rnn = request.POST.get('roomname')
@@ -98,13 +105,20 @@ def update_room_number_page(request,prop_id):
         except MultiValueDictKeyError:
             file=roomnamedb.objects.get(id=prop_id).ROOMIMAGE
         
+        # Try to get room type - handle both ID and name for backward compatibility
+        room_type = None
         try:
-            room_type = roomtypedb.objects.get(id=rt_id)
-        except roomtypedb.DoesNotExist:
-            messages.error(request, "Invalid room type selected")
-            return redirect(display_room_number_page)
+            # Try as ID first
+            room_type = roomtypedb.objects.get(id=int(rt_id))
+        except (ValueError, roomtypedb.DoesNotExist):
+            try:
+                # Fallback: try as name
+                room_type = roomtypedb.objects.get(ROOMTYPE__iexact=rt_id)
+            except roomtypedb.DoesNotExist:
+                messages.error(request, "Invalid room type selected")
+                return redirect(display_room_number_page)
         
-        roomnamedb.objects.filter(id=prop_id).update(ROOMTYPE_id=rt_id, ROOMDESCRIPTION=ds, ROOMIMAGE=file, ROOMPRICE=rp, ROOMNAME=rnn)
+        roomnamedb.objects.filter(id=prop_id).update(ROOMTYPE_id=room_type.id, ROOMDESCRIPTION=ds, ROOMIMAGE=file, ROOMPRICE=rp, ROOMNAME=rnn)
         messages.success(request, "Rooms Details updated")
         return redirect(display_room_number_page)
 
