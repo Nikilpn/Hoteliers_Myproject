@@ -349,7 +349,7 @@ def reset_password_email_verification(request):
             }
             return render(request, "16password_reset_otp.html", context)
         else:
-            return render(request, "15password_reset_otp.html", {'error': "Sorry..Invalid email id"})
+            return render(request, "16password_reset_otp.html", {'error': "Sorry..Invalid email id"})
     else:
         return redirect("home")
 
