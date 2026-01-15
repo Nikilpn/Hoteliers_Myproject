@@ -11,7 +11,7 @@ class roomtypedb(models.Model):
 
 #
 class roomnamedb(models.Model):
-    ROOMTYPE = models.CharField(max_length=100, null=True, blank=True)
+    ROOMTYPE = models.ForeignKey(roomtypedb, on_delete=models.CASCADE, null=True, blank=True, related_name='rooms')
     ROOMNAME=models.CharField(max_length=100,null=True,blank=True)
     ROOMIMAGE=models.ImageField(upload_to="roomimage",null=True,blank=True)
     ROOMPRICE=models.IntegerField(null=True,blank=True)
