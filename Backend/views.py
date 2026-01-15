@@ -62,7 +62,17 @@ def save_room_number_page(request):
         ds = request.POST.get('roomdescription')
         rp = request.POST.get('roomprice')
         rnn = request.POST.get('roomname')
-        img = request.FILES['roomimage']
+        
+        # Handle optional image file
+        img = None
+        try:
+            img = request.FILES.get('roomimage')
+        except (KeyError, MultiValueDictKeyError):
+            pass
+        
+        if not img:
+            messages.error(request, "Room image is required")
+            return redirect(room_number_page)
         
         # Try to get room type - handle both ID and name for backward compatibility
         room_type = None
