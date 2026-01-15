@@ -47,7 +47,16 @@ def save_customer_contact_page(request):
 # Backend models(roomnamedb) connected to Webapp  page and showing  someparticular category added to luxury type like wise..
 
 def filtered_room_name(request, room_name):
-    data = roomnamedb.objects.filter(ROOMTYPE=room_name)
+    # Try to get roomtypedb by ID first (new links), then by ROOMTYPE name (legacy links)
+    try:
+        room_type = roomtypedb.objects.get(id=int(room_name))
+    except (ValueError, roomtypedb.DoesNotExist):
+        try:
+            room_type = roomtypedb.objects.get(ROOMTYPE__iexact=room_name)
+        except roomtypedb.DoesNotExist:
+            return render(request, "6roomname_filtered.html", {'data': [], 'error': 'Room type not found'})
+    
+    data = roomnamedb.objects.filter(ROOMTYPE=room_type)
     return render(request, "6roomname_filtered.html", {'data': data})
 
 
