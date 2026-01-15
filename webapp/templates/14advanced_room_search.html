@@ -349,10 +349,9 @@
                     <label for="room-type">Room Type</label>
                     <select id="room-type" name="room_type">
                         <option value="">All Room Types</option>
-                        <option value="1">Luxury</option>
-                        <option value="2">Deluxe</option>
-                        <option value="3">Standard</option>
-                        <option value="4">Budget</option>
+                        {% for room_type in room_types %}
+                        <option value="{{ room_type.id }}">{{ room_type.ROOMTYPE|title }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
