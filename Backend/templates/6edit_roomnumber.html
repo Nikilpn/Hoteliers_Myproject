@@ -22,13 +22,11 @@
         <div class="form-group">
                       <label for="exampleSelectGender">Room Type</label>
                         <select class="form-control" id="exampleSelectGender" name="roomtype">
-
-
-                            <option>{{pro.ROOMTYPE}}</option>
+                            <option value="{{pro.ROOMTYPE.id}}">{{pro.ROOMTYPE}}</option>
                             {% for i in cat %}
-
-                            <option>{{i.ROOMTYPE}}</option>
+                            <option value="{{i.id}}">{{i.ROOMTYPE}}</option>
                             {% endfor %}
+                        </select>
 
                         </select>
                       </div>

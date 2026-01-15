@@ -22,9 +22,9 @@
         <div class="form-group">
                       <label for="exampleSelectGender">Room Type</label>
                         <select class="form-control" id="exampleSelectGender" name="roomtype">
-                          <option>select</option>
+                          <option value="">select</option>
                           {% for d in pro %}
-                            <option>{{d.ROOMTYPE}}</option>
+                            <option value="{{d.id}}">{{d.ROOMTYPE}}</option>
                             {% endfor %}
                         </select>
                       </div>
