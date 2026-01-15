@@ -58,12 +58,19 @@ def room_number_page(request):
 
 def save_room_number_page(request):
     if request.method == "POST":
-        rt=request.POST.get('roomtype')
+        rt_id = request.POST.get('roomtype')  # This is now a room type ID
         ds = request.POST.get('roomdescription')
         rp = request.POST.get('roomprice')
-        rnn=request.POST.get('roomname')
-        img=request.FILES['roomimage']
-        obj=roomnamedb(ROOMTYPE=rt,ROOMDESCRIPTION=ds,ROOMIMAGE=img,ROOMPRICE=rp,ROOMNAME=rnn)
+        rnn = request.POST.get('roomname')
+        img = request.FILES['roomimage']
+        
+        try:
+            room_type = roomtypedb.objects.get(id=rt_id)  # Get the roomtypedb object
+        except roomtypedb.DoesNotExist:
+            messages.error(request, "Invalid room type selected")
+            return redirect(room_number_page)
+        
+        obj = roomnamedb(ROOMTYPE=room_type, ROOMDESCRIPTION=ds, ROOMIMAGE=img, ROOMPRICE=rp, ROOMNAME=rnn)
         obj.save()
         messages.success(request, "Room saved succesfully")
         return redirect(room_number_page)
@@ -79,7 +86,7 @@ def edit_room_number_page(request,Edit_id):
 
 def update_room_number_page(request,prop_id):
     if request.method == "POST":
-        rt = request.POST.get('roomtype')
+        rt_id = request.POST.get('roomtype')  # This is now a room type ID
         ds = request.POST.get('roomdescription')
         rp = request.POST.get('roomprice')
         rnn = request.POST.get('roomname')
@@ -90,7 +97,14 @@ def update_room_number_page(request,prop_id):
             file=fs.save(img.name,img)
         except MultiValueDictKeyError:
             file=roomnamedb.objects.get(id=prop_id).ROOMIMAGE
-        roomnamedb.objects.filter(id=prop_id).update(ROOMTYPE=rt,ROOMDESCRIPTION=ds,ROOMIMAGE=file,ROOMPRICE=rp,ROOMNAME=rnn)
+        
+        try:
+            room_type = roomtypedb.objects.get(id=rt_id)
+        except roomtypedb.DoesNotExist:
+            messages.error(request, "Invalid room type selected")
+            return redirect(display_room_number_page)
+        
+        roomnamedb.objects.filter(id=prop_id).update(ROOMTYPE_id=rt_id, ROOMDESCRIPTION=ds, ROOMIMAGE=file, ROOMPRICE=rp, ROOMNAME=rnn)
         messages.success(request, "Rooms Details updated")
         return redirect(display_room_number_page)
 
